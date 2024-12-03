@@ -3,6 +3,7 @@ let dataTableIsInitialized = false;
 
 const web='http://localhost:8080/alumno';
 const addAlumno = document.querySelector('.addAlumnoForm');
+const id = document.getElementById('id');
 const nombre= document.getElementById('nombre');
 const apellido = document.getElementById('apellido');
 const email = document.getElementById('email');
@@ -11,6 +12,8 @@ const telefono = document.getElementById('telefono');
 const sexo = document.getElementById('sexo');
 const tablaAlumnos = document.querySelector('.table');
 const formAlumno = document.querySelector('.tablaAlumno');
+
+const btnAgregar = document.querySelector('.btnAddAlumno');
 
 const dataTableOptions ={
     //scrollX: "2000px",
@@ -184,5 +187,47 @@ formAlumno.addEventListener('click', (e) => {
         telefono.value = telefonoE;
         sexo.value = sexoE;
         
-    }
+    btnAgregar.textContent = 'Actualizar';
+    btnAgregar.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('actualizar alumno');
+    
+        fetch(`${web}/${idE}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+                body: JSON.stringify({
+                    id: idE,
+                    nombre: nombre.value,
+                    apellido: apellido.value,
+                    email: email.value,
+                    edad: edad.value,
+                    telefono: telefono.value,
+                    sexo: sexo.value
+                })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            Swal.fire({
+                title: 'Actualizado!',
+                text: 'El alumno se actualizó correctamente',
+                icon: 'success',
+            }).then(() => {
+                window.location.reload();
+            });
+            addAlumno.reset();
+            initDataTable();
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Hubo un error al actualizar el alumno',
+                icon: 'error',
+            });
+        });
+    });
+    };
 });
