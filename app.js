@@ -2,7 +2,10 @@ let dataTable;
 let dataTableIsInitialized = false;
 
 const web='http://localhost:8080/alumno';
-const addAlumno = document.querySelector('.addAlumnoForm');
+const title = document.getElementById('title');
+const descrip = document.getElementById('descrip');
+const addAlumno = document.getElementById('addAlumnoForm');
+//Elementos Propios de la pagina especifica
 const id = document.getElementById('id');
 const nombre= document.getElementById('nombre');
 const apellido = document.getElementById('apellido');
@@ -10,10 +13,12 @@ const email = document.getElementById('email');
 const edad = document.getElementById('edad');
 const telefono = document.getElementById('telefono');
 const sexo = document.getElementById('sexo');
-const tablaAlumnos = document.querySelector('.table');
-const formAlumno = document.querySelector('.tablaAlumno');
 
-const btnAgregar = document.querySelector('.btnAddAlumno');
+// creo que estos elementos no son necesarios
+const tablaAlumnos = document.querySelector('.table');
+const formAlumno = document.querySelector('.tablaContenido');
+
+const btnAgregar = document.querySelector('.btnAddInfo');
 
 const dataTableOptions ={
     //scrollX: "2000px",
@@ -59,23 +64,36 @@ const listAlumnos= async () => {
             </div>
             </tr>`;
         });
-        bodyAlumno.innerHTML = content;
+        bodyTable.innerHTML = content;
     }
         catch(error){
             console.log(error);
         }
     };
 
+    //Con esto comienza todo la primera vez
     window.addEventListener("load", async () => {
         initDataTable();
+        title.innerText = 'Lista de Alumnos';
+        descrip.innerText = 'Aqui puedes ver la lista de alumnos';
     });
 
 
-addAlumno.addEventListener('submit', ( e ) => {
+
+    //Codigo para Agrergar Alumno
+    document.getElementById('btnAddInfo').addEventListener('click', async (e) => {
     
     e.preventDefault();
 
     console.log(nombre.value);
+    if (nombre.value === '' || apellido.value === '' || email.value === '' || edad.value === '' || telefono.value === '' || sexo.value === '') {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Por favor, complete todos los campos',
+            icon: 'error',
+        });
+        return;
+    }
     fetch(web, {
         method: 'POST',
         headers: {
@@ -113,7 +131,7 @@ addAlumno.addEventListener('submit', ( e ) => {
     });
 });
 
-
+//Codigo para Borrar y Editar Alumno
 formAlumno.addEventListener('click', (e) => {
     //console.log(e.target.id);
     e.preventDefault();
@@ -188,7 +206,7 @@ formAlumno.addEventListener('click', (e) => {
         sexo.value = sexoE;
         
     btnAgregar.textContent = 'Actualizar';
-    btnAgregar.addEventListener('click', (e) => {
+document.getElementById('btnAddInfo').addEventListener('click', async (e) => {
         e.preventDefault();
         console.log('actualizar alumno');
     
@@ -231,3 +249,40 @@ formAlumno.addEventListener('click', (e) => {
     });
     };
 });
+
+//Cargar el formulario de Alumno la primera vez
+window.addEventListener('load', async () => {
+    await formAlumnoShow();
+});
+
+const formAlumnoShow= async () => {
+    try{
+    let formHtml = `
+        <div class="NuevoAlumno">
+            <form class="addAlumnoForm">
+                <h3>Info Alumno</h3>
+                <input type="text" id="nombre" placeholder="Nombre" required><br>
+                <input type="text" id="apellido" placeholder="Apellido" required><br>
+                <input type="text" id="email" placeholder="Email" required><br>
+                <input type="text" id="edad" placeholder="Edad" required><br>
+                <input type="text" id="telefono" placeholder="Telefono" required><br>
+                <input type="text" id="sexo" placeholder="Sexo" required><br>
+                <button type="submit" class="btnAddInfo" id="btnAddInfo">Agregar Alumno</button>
+                <br>
+            </form>
+        </div>
+    `;
+
+    formContainer.innerHTML = formHtml;
+
+    }catch(error){
+        console.log(error);
+    }
+};
+
+document.getElementById('selectAlumnos').addEventListener('click', async () => {
+        initDataTable();
+        await formAlumnoShow();
+        title.innerText = 'Lista de Alumnos';
+        descrip.innerText = 'Aqui puedes ver la lista de alumnos';
+    });
